@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
+import logo from '../assets/logo.png'
+import buzzMascot from '../assets/buzz-mascot.png'
 
 export default function AuthPage() {
   const { user, signIn, signUp, signInWithGoogle } = useAuth()
@@ -47,18 +49,14 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
+        {/* Logo + Mascot */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-block">
-            <h1
-              className="text-5xl text-yellow-400"
-              style={{ fontFamily: 'Bangers, cursive', letterSpacing: '0.05em' }}
-            >
-              🐛 Wuzzabug
-            </h1>
+          <Link to="/" className="inline-block mb-4">
+            <img src={logo} alt="Wuzzabug" className="h-16 mx-auto" />
           </Link>
-          <p className="text-gray-500 mt-2">
-            {mode === 'signin' ? 'Welcome back, bug hunter!' : 'Join the bug hunt!'}
+          <img src={buzzMascot} alt="Buzz" className="w-32 mx-auto mb-3" />
+          <p className="text-yellow-400 font-bold">
+            Sign in to submit your bugs, you absolute legend.
           </p>
         </div>
 

@@ -4,6 +4,8 @@ import BugCard from '../components/BugCard'
 import BugCarousel from '../components/BugCarousel'
 import AdSlot from '../components/AdSlot'
 import { getWeekStart } from '../lib/helpers'
+import heroBanner from '../assets/hero-banner.png'
+import buzzMascot from '../assets/buzz-mascot.png'
 
 const SORT_OPTIONS = [
   { value: 'votes', label: '⚡ Most Votes' },
@@ -57,21 +59,11 @@ export default function Home() {
 
   return (
     <div className="page-container">
+      {/* Hero Banner */}
+      <img src={heroBanner} alt="Wuzzabug - Funny Bug Photos" className="w-full object-cover max-h-64 rounded-xl mb-6" />
+
       {/* Banner Ad */}
       <AdSlot position="banner-top" className="w-full h-24 mb-6" />
-
-      {/* Hero */}
-      <div className="text-center mb-8">
-        <h1
-          className="text-5xl md:text-7xl text-yellow-400 mb-3"
-          style={{ fontFamily: 'Bangers, cursive', letterSpacing: '0.05em' }}
-        >
-          🐛 Wuzzabug
-        </h1>
-        <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto">
-          The internet's greatest bugs. Curated by people with too much time.
-        </p>
-      </div>
 
       {/* Carousel */}
       <BugCarousel />
@@ -110,14 +102,9 @@ export default function Home() {
           ))}
         </div>
       ) : bugs.length === 0 ? (
-        <div className="text-center py-24">
-          <div className="text-7xl mb-4">🐛</div>
-          <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'Bangers, cursive' }}>
-            No bugs here... yet
-          </h2>
-          <p className="text-gray-500 mb-6">
-            {sort === 'weekly' ? "No bugs submitted this week." : "Be the first to submit a bug!"}
-          </p>
+        <div className="flex flex-col items-center py-20 gap-4">
+          <img src={buzzMascot} alt="Buzz" className="w-48 opacity-80" />
+          <p className="text-yellow-400 font-bold text-xl">No bugs yet. Be the first degenerate.</p>
         </div>
       ) : (
         <>

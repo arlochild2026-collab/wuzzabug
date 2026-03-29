@@ -7,6 +7,7 @@ import BugPage from './pages/BugPage'
 import Admin from './pages/Admin'
 import LeaderboardPage from './pages/LeaderboardPage'
 import AuthPage from './pages/AuthPage'
+import NotFound from './pages/NotFound'
 
 function AdminRoute({ children }) {
   const { user, isAdmin, loading } = useAuth()
@@ -30,7 +31,7 @@ function AppRoutes() {
             <Admin />
           </AdminRoute>
         } />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   )
