@@ -34,8 +34,8 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center group">
-            <img src={logo} alt="Wuzzabug" className="h-12" />
+          <Link to="/" className="flex items-center">
+            <img src={logo} alt="Wuzzabug" className="h-14" />
           </Link>
 
           {/* Desktop nav */}
@@ -51,6 +51,13 @@ export default function Navbar() {
               <>
                 <Link to="/submit" className="btn-primary text-sm">
                   + Submit Bug
+                </Link>
+                <Link
+                  to={`/user/${user.id}`}
+                  className="w-8 h-8 rounded-full bg-yellow-400/20 border border-yellow-400/40 flex items-center justify-center text-base hover:bg-yellow-400/30 transition-colors"
+                  title="My Profile"
+                >
+                  🐛
                 </Link>
                 <button
                   onClick={handleSignOut}
@@ -91,6 +98,9 @@ export default function Navbar() {
               <>
                 <Link to="/submit" onClick={() => setMenuOpen(false)} className="btn-primary text-sm text-center">
                   + Submit Bug
+                </Link>
+                <Link to={`/user/${user.id}`} onClick={() => setMenuOpen(false)} className="text-gray-300 hover:text-yellow-400 text-sm transition-colors">
+                  🐛 My Profile
                 </Link>
                 <button onClick={handleSignOut} className="text-gray-400 text-sm text-left">
                   Sign Out

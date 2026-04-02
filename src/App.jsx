@@ -8,6 +8,8 @@ import Admin from './pages/Admin'
 import LeaderboardPage from './pages/LeaderboardPage'
 import AuthPage from './pages/AuthPage'
 import NotFound from './pages/NotFound'
+import ProfilePage from './pages/ProfilePage'
+import SitemapPage from './pages/SitemapPage'
 
 function AdminRoute({ children }) {
   const { user, isAdmin, loading } = useAuth()
@@ -26,11 +28,13 @@ function AppRoutes() {
         <Route path="/bug/:id" element={<BugPage />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/user/:id" element={<ProfilePage />} />
         <Route path="/admin" element={
           <AdminRoute>
             <Admin />
           </AdminRoute>
         } />
+        <Route path="/sitemap.xml" element={<SitemapPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

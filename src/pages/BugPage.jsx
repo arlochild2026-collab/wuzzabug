@@ -3,6 +3,7 @@ import { useParams, Link, Navigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import BugDetail from '../components/BugDetail'
 import AdSlot from '../components/AdSlot'
+import SEO from '../components/SEO'
 
 export default function BugPage() {
   const { id } = useParams()
@@ -31,6 +32,7 @@ export default function BugPage() {
   if (loading) {
     return (
       <div className="page-container">
+        <SEO noindex />
         <div className="max-w-4xl mx-auto animate-pulse space-y-4">
           <div className="aspect-video bg-[#1a1a1a] rounded-2xl" />
           <div className="h-12 bg-[#1a1a1a] rounded-xl w-3/4" />
@@ -43,6 +45,7 @@ export default function BugPage() {
   if (notFound) {
     return (
       <div className="page-container text-center py-24">
+        <SEO title="Bug Not Found" noindex />
         <div className="text-7xl mb-4">🐛</div>
         <h1 className="text-3xl font-bold text-white mb-3" style={{ fontFamily: 'Bangers, cursive' }}>
           Bug Not Found
@@ -53,8 +56,41 @@ export default function BugPage() {
     )
   }
 
+  // Build JSON-LD for the individual bug (ImageObject schema)
+  const bugJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ImageObject',
+    name: bug.title,
+    description: bug.description || `Funny bug photo: ${bug.title}`,
+    contentUrl: bug.image_url,
+    url: `https://wuzzabug.com/bug/${bug.id}`,
+    datePublished: bug.created_at,
+    author: {
+      '@type': 'Person',
+      identifier: bug.submitted_by,
+    },
+    interactionStatistic: {
+      '@type': 'InteractionCounter',
+      interactionType: 'https://schema.org/LikeAction',
+      userInteractionCount: bug.funny_score,
+    },
+  }
+
+  // Truncate description to ~155 chars for meta
+  const metaDesc = bug.description
+    ? `${bug.description.slice(0, 140)}… Vote on Wuzzabug!`
+    : `Check out "${bug.title}" — a hilarious bug photo on Wuzzabug. Vote and react!`
+
   return (
     <div className="page-container">
+      <SEO
+        title={bug.title}
+        description={metaDesc}
+        image={bug.image_url}
+        url={`https://wuzzabug.com/bug/${bug.id}`}
+        type="article"
+        jsonLd={bugJsonLd}
+      />
       <div className="flex gap-8">
         {/* Main content */}
         <div className="flex-1 min-w-0">

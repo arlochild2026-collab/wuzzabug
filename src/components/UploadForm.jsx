@@ -2,8 +2,9 @@ import { useState, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../lib/AuthContext'
 
-const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm', 'video/ogg']
+const ANTHROPIC_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY
 
 export default function UploadForm({ onSuccess }) {
   const { user } = useAuth()
@@ -16,6 +17,49 @@ export default function UploadForm({ onSuccess }) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [dragOver, setDragOver] = useState(false)
+  const [generating, setGenerating] = useState(null) // 'title' | 'description' | null
+
+  const generateContent = async (field) => {
+    if (!ANTHROPIC_KEY) {
+      setError('Add VITE_ANTHROPIC_API_KEY to your .env file to use AI generation.')
+      return
+    }
+    setGenerating(field)
+    try {
+      const prompt = field === 'title'
+        ? `You write punchy, funny headlines for a site called Wuzzabug — a place people share photos of dead, weird, or hilarious bugs. The tagline is "It's Dead Jim. We Promised." Generate a single witty headline (5–10 words, no quotes, no explanation) for a bug photo submission.${description ? ` Context from the user: "${description}"` : ''}`
+        : `You write short, irreverent descriptions for bug photos on Wuzzabug — a site with the tagline "It's Dead Jim. We Promised." Write 1–2 funny sentences (max 120 chars) describing a bug photo.${title ? ` The headline is: "${title}"` : ''} Return only the description, no quotes.`
+
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': ANTHROPIC_KEY,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 120,
+          messages: [{ role: 'user', content: prompt }],
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(`AI error: ${data.error?.message || res.statusText}`)
+        return
+      }
+      const text = data.content?.[0]?.text?.trim()
+      if (text) {
+        if (field === 'title') setTitle(text.slice(0, 100))
+        else setDescription(text.slice(0, 500))
+      }
+    } catch (err) {
+      setError('AI generation failed. Check your API key and try again.')
+    } finally {
+      setGenerating(null)
+    }
+  }
 
   const handleFile = (f) => {
     if (!f) return
@@ -24,7 +68,7 @@ export default function UploadForm({ onSuccess }) {
       return
     }
     if (f.size > MAX_FILE_SIZE) {
-      setError('File must be under 50MB.')
+      setError('File must be under 10MB.')
       return
     }
     setError('')
@@ -91,9 +135,29 @@ export default function UploadForm({ onSuccess }) {
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Title */}
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">
-          Title <span className="text-red-400">*</span>
-        </label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-sm font-medium text-gray-300">
+            Title <span className="text-red-400">*</span>
+          </label>
+          <button
+            type="button"
+            onClick={() => generateContent('title')}
+            disabled={generating !== null}
+            className="flex items-center gap-1.5 text-xs text-yellow-400 hover:text-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {generating === 'title' ? (
+              <>
+                <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Generating...
+              </>
+            ) : (
+              <>✨ Generate headline</>
+            )}
+          </button>
+        </div>
         <input
           type="text"
           value={title}
@@ -108,9 +172,29 @@ export default function UploadForm({ onSuccess }) {
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">
-          Description <span className="text-gray-500">(optional)</span>
-        </label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-sm font-medium text-gray-300">
+            Description <span className="text-gray-500">(optional)</span>
+          </label>
+          <button
+            type="button"
+            onClick={() => generateContent('description')}
+            disabled={generating !== null}
+            className="flex items-center gap-1.5 text-xs text-yellow-400 hover:text-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {generating === 'description' ? (
+              <>
+                <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Generating...
+              </>
+            ) : (
+              <>✨ Generate description</>
+            )}
+          </button>
+        </div>
         <textarea
           value={description}
           onChange={e => setDescription(e.target.value)}
@@ -166,7 +250,7 @@ export default function UploadForm({ onSuccess }) {
             <>
               <div className="text-5xl mb-3">📷</div>
               <p className="text-white font-medium mb-1">Drag & drop or click to upload</p>
-              <p className="text-gray-500 text-sm">Images (JPG, PNG, GIF, WebP) or Videos (MP4, WebM) · Max 50MB</p>
+              <p className="text-gray-500 text-sm">Images (JPG, PNG, GIF, WebP) or Videos (MP4, WebM) · Max 10MB</p>
             </>
           )}
         </div>

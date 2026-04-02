@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /auth
+Disallow: /user/
+
+# Prevent crawling of sort/filter URL variants to avoid thin-content duplication
+Disallow: /*?sort=
+Disallow: /*?page=
+
+# Sitemap location
+Sitemap: https://wuzzabug.com/sitemap.xml

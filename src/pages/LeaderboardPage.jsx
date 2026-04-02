@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import Leaderboard from '../components/Leaderboard'
+import SEO from '../components/SEO'
 import { getWeekStart } from '../lib/helpers'
 
 export default function LeaderboardPage() {
@@ -51,6 +52,11 @@ export default function LeaderboardPage() {
 
   return (
     <div className="page-container">
+      <SEO
+        title="Bug Hall of Fame — Leaderboard"
+        description="See Wuzzabug's most-voted bug photos of all time. The weekly top 5, all-time top 10, and the legendary Hall of Fame — bugs that earned 100+ votes."
+        url="https://wuzzabug.com/leaderboard"
+      />
       {/* Header */}
       <div className="text-center mb-10">
         <h1

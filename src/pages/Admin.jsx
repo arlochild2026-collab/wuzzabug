@@ -1,5 +1,6 @@
 import { useAuth } from '../lib/AuthContext'
 import ModerationDashboard from '../components/ModerationDashboard'
+import BotdPicker from '../components/BotdPicker'
 
 export default function Admin() {
   const { user, isAdmin } = useAuth()
@@ -30,6 +31,14 @@ export default function Admin() {
             <p className="text-gray-500 text-xs mt-1">{stat.desc}</p>
           </div>
         ))}
+      </div>
+
+      {/* Bug of the Day */}
+      <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl p-6 mb-6">
+        <h2 className="text-xl font-bold text-white mb-6" style={{ fontFamily: 'Bangers, cursive', letterSpacing: '0.05em' }}>
+          ☀️ Bug of the Day
+        </h2>
+        <BotdPicker />
       </div>
 
       {/* Moderation */}

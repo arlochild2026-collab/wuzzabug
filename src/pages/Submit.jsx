@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Navigate, Link } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import UploadForm from '../components/UploadForm'
+import SEO from '../components/SEO'
 
 export default function Submit() {
   const { user, loading } = useAuth()
@@ -57,6 +58,11 @@ export default function Submit() {
 
   return (
     <div className="page-container">
+      <SEO
+        title="Submit Your Bug"
+        description="Found a funny, gross, or weird bug? Submit your bug photo to Wuzzabug and let the internet vote on it. All submissions are reviewed before going live."
+        url="https://wuzzabug.com/submit"
+      />
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8">
