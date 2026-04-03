@@ -1,0 +1,79 @@
+/* ================================================================
+   Wuzzabug – Bug Animations
+   All keyframe animations for BugSplat, ReactionPicker, BuzzCameo
+   ================================================================ */
+
+/* ------------------------------------------------------------------
+   Animation 1: Bug Splat  (vote button click)
+   The bug flies in from a random edge toward the button center,
+   squishes flat, then fades.
+   Uses CSS custom properties set inline:
+     --tx / --ty   translation to button center (px)
+     --rot         final rotation angle (deg)
+   ------------------------------------------------------------------ */
+@keyframes bugFly {
+  0%   { transform: translate(0, 0)                           scale(1)       rotate(0deg);      opacity: 1;   }
+  60%  { transform: translate(var(--tx), var(--ty))           scale(1.2)     rotate(var(--rot)); opacity: 1;   }
+  80%  { transform: translate(var(--tx), var(--ty)) scaleX(0.3) scaleY(0.15) rotate(var(--rot)); opacity: 0.9; }
+  100% { transform: translate(var(--tx), var(--ty))           scale(0)       rotate(var(--rot)); opacity: 0;   }
+}
+
+/* ------------------------------------------------------------------
+   Animation 2: Bug Parade  (emoji reaction click)
+   Tiny emoji bugs scatter outward from the reaction button.
+   Uses CSS custom properties set inline:
+     --px / --py   target scatter offset (px)
+     --spin        total rotation during flight (deg)
+   ------------------------------------------------------------------ */
+@keyframes bugParade {
+  0%   { transform: translate(0, 0)                                             scale(1)   rotate(0deg);                    opacity: 1;   }
+  20%  { transform: translate(calc(var(--px) * 0.25), calc(var(--py) * 0.25)) scale(1.4) rotate(calc(var(--spin) * 0.2)); opacity: 1;   }
+  70%  { transform: translate(var(--px), var(--py))                             scale(0.9) rotate(var(--spin));             opacity: 0.8; }
+  100% { transform: translate(calc(var(--px) * 1.4), calc(var(--py) * 1.4))   scale(0)   rotate(calc(var(--spin) * 1.5)); opacity: 0;   }
+}
+
+/* ------------------------------------------------------------------
+   Animation 3: Vote count bounce  (applied to the score number)
+   ------------------------------------------------------------------ */
+@keyframes countBounce {
+  0%   { transform: scale(1);    }
+  25%  { transform: scale(1.55); }
+  55%  { transform: scale(0.85); }
+  78%  { transform: scale(1.12); }
+  100% { transform: scale(1);    }
+}
+
+/* ------------------------------------------------------------------
+   Animation 4: Buzz mascot slide-in from right
+   ------------------------------------------------------------------ */
+@keyframes buzzSlideIn {
+  0%   { transform: translateX(110px); opacity: 0; }
+  25%  { opacity: 1;                               }
+  100% { transform: translateX(0);     opacity: 1; }
+}
+
+/* ------------------------------------------------------------------
+   Animation 5: Buzz mascot slide-out to the right
+   ------------------------------------------------------------------ */
+@keyframes buzzSlideOut {
+  0%   { transform: translateX(0);     opacity: 1; }
+  70%  { opacity: 1;                               }
+  100% { transform: translateX(110px); opacity: 0; }
+}
+
+/* ------------------------------------------------------------------
+   Accessibility: skip all animations for users who prefer reduced motion
+   ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .bug-splat,
+  .bug-parade-particle,
+  .buzz-cameo {
+    animation: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .vote-count-bounce {
+    animation: none !important;
+  }
+}
