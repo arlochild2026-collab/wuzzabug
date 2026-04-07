@@ -145,6 +145,30 @@ create policy "Admin manage promotions"
 --   with check (bucket_id = 'bugs' and auth.uid() is not null);
 
 -- ============================================================
+-- VOTE TRIGGER — keeps funny_score in sync automatically
+-- Runs as SECURITY DEFINER so it can update bugs without
+-- requiring an UPDATE policy for regular users.
+-- ============================================================
+
+create or replace function update_funny_score()
+returns trigger as $$
+begin
+  if TG_OP = 'INSERT' then
+    update bugs set funny_score = funny_score + 1 where id = NEW.bug_id;
+    return NEW;
+  elsif TG_OP = 'DELETE' then
+    update bugs set funny_score = funny_score - 1 where id = OLD.bug_id;
+    return OLD;
+  end if;
+  return null;
+end;
+$$ language plpgsql security definer;
+
+create trigger on_vote_change
+  after insert or delete on votes
+  for each row execute function update_funny_score();
+
+-- ============================================================
 -- INDEXES (for performance)
 -- ============================================================
 

@@ -38,6 +38,17 @@ export default function VoteButton({ bugId, initialScore = 0 }) {
     setScore(initialScore)
   }, [initialScore])
 
+  // Subscribe to real-time updates on the bugs table for this bug
+  useEffect(() => {
+    const subscription = supabase
+      .channel(`bugs:${bugId}`)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'bugs', filter: `id=eq.${bugId}` }, (payload) => {
+        setScore(payload.new.funny_score)
+      })
+      .subscribe()
+    return () => subscription.unsubscribe()
+  }, [bugId])
+
   /** Spawn a BugSplat at a random edge of the button, flying toward centre. */
   const spawnSplat = () => {
     const el = buttonRef.current
@@ -84,30 +95,20 @@ export default function VoteButton({ bugId, initialScore = 0 }) {
 
     try {
       if (hasVoted) {
-        // Remove vote
+        // Remove vote — trigger on votes table auto-decrements funny_score
         await supabase
           .from('votes')
           .delete()
           .eq('bug_id', bugId)
           .eq('user_id', user.id)
 
-        await supabase
-          .from('bugs')
-          .update({ funny_score: score - 1 })
-          .eq('id', bugId)
-
         setScore((s) => s - 1)
         setHasVoted(false)
       } else {
-        // Add vote
+        // Add vote — trigger on votes table auto-increments funny_score
         await supabase
           .from('votes')
           .insert({ bug_id: bugId, user_id: user.id })
-
-        await supabase
-          .from('bugs')
-          .update({ funny_score: score + 1 })
-          .eq('id', bugId)
 
         setScore((s) => s + 1)
         setHasVoted(true)
